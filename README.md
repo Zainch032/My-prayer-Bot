@@ -21,6 +21,12 @@ General AI models (like ChatGPT) suffer from "knowledge cutoff" and often fail t
 
 ---
 
+## 🖼️ Visual Overview
+
+### User Interface :
+
+![alt text](image-1.png)
+
 ## 💻 Installation & Setup
 
 ### 1. Clone the Repository
@@ -29,6 +35,7 @@ git clone (https://github.com/Zainch032/pakistan-prayer-bot.git)
 cd pakistan-prayer-bot
 
 ```
+
 
 ### 2. Create a Virtual Environment (Recommended)
 
@@ -96,6 +103,7 @@ The project utilizes a **Reasoning and Acting (ReAct)** pattern:
 5. **Final Output:** The AI filters the JSON to find "Fajr" and replies with a human-friendly sentence.
 
 ---
+
 
 ## 📜 License
 
