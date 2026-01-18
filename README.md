@@ -1,5 +1,4 @@
 
-```markdown
 # 🕌 Pakistan Prayer Assistant (Agentic AI)
 
 A specialized AI-powered prayer timing assistant designed for accuracy across all major cities in Pakistan. Unlike general LLMs which often provide outdated or estimated timings, this assistant uses **Tool-Calling (Agentic AI)** to retrieve real-time data directly from the Aladhan API.
@@ -26,7 +25,7 @@ General AI models (like ChatGPT) suffer from "knowledge cutoff" and often fail t
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/Zainch032/pakistan-prayer-bot.git](https://github.com/Zainch032/pakistan-prayer-bot.git)
+git clone (https://github.com/Zainch032/pakistan-prayer-bot.git)
 cd pakistan-prayer-bot
 
 ```
@@ -102,22 +101,3 @@ The project utilizes a **Reasoning and Acting (ReAct)** pattern:
 
 Distributed under the MIT License. See `LICENSE` for more information.
 
-```
-
----
-
-### 💡 Benefits of This Professional Setup
-* **Virtual Environments:** By including the `venv` steps, you show that you follow industry-standard coding practices. It prevents the "it works on my machine" problem.
-* **Visuals:** Using the `
-
-[Image of X]
-` tag helps recruiters or users instantly understand the architecture of your bot without reading every line of code.
-* **Problem-Solution Narrative:** Explicitly stating that "ChatGPT never tells the exact time" positions your project as a **technical solution** to a real-world AI limitation.
-
-[Python Virtual Environments Tutorial](https://www.youtube.com/watch?v=KxvKZi-ixAg)
-
-This video is helpful because it provides a visual, step-by-step walkthrough of setting up virtual environments, which is a critical step in the professional installation process described in your README.
-
-**Would you like me to help you generate a `requirements.txt` file based on the code we wrote?**
-
-```
