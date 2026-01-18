@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pakistan Prayer Bot</title>
+    <style>
+        /* Modern Variables */
+        :root {
+            --primary-green: #2e7d32;
+            --hover-green: #388e3c;
+            --active-depth: #1b5e20;
+            --bg-light: #f0f2f5;
+            --user-bubble: #e3f2fd;
+            --bot-bubble: #f1f8e9;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background-color: var(--bg-light); 
+            margin: 0; display: flex; justify-content: center; align-items: center; 
+            height: 100vh; 
+        }
+
+        /* Medium Sized Chat Container */
+        .chat-container { 
+            width: 450px; /* Professional medium width */
+            height: 600px;
+            background: white; 
+            border-radius: 20px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        header {
+            background: var(--primary-green);
+            color: white; padding: 20px; text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #chatbox { 
+            flex-grow: 1; padding: 20px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 12px;
+            background: #ffffff;
+        }
+
+        /* Animated Message Bubbles */
+        .msg {
+            max-width: 85%; padding: 12px 16px; border-radius: 18px;
+            font-size: 15px; line-height: 1.5;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(15px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .user { align-self: flex-end; background: var(--user-bubble); color: #1a237e; border-bottom-right-radius: 4px; }
+        .bot { align-self: flex-start; background: var(--bot-bubble); color: #1b5e20; border-bottom-left-radius: 4px; }
+
+        /* Controls Section */
+        .controls { 
+            padding: 20px; border-top: 1px solid #eee;
+            display: flex; align-items: center; gap: 12px; background: #fafafa;
+        }
+
+        #userInput { 
+            flex-grow: 1; padding: 14px 20px; border: 2px solid #e0e0e0; 
+            border-radius: 30px; outline: none; transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        #userInput:focus { border-color: var(--primary-green); background: white; }
+
+        /* TACTILE EASY SEND BUTTON */
+        button { 
+            padding: 12px 28px; background: var(--primary-green); color: white; 
+            border: none; border-radius: 30px; cursor: pointer; 
+            font-weight: bold; font-size: 15px;
+            box-shadow: 0 4px 0 var(--active-depth); /* 3D depth */
+            transition: all 0.1s ease; position: relative; top: 0;
+        }
+
+        button:hover:not(:disabled) { background: var(--hover-green); transform: translateY(-2px); box-shadow: 0 6px 0 var(--active-depth); }
+        button:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--active-depth); }
+        button:disabled { background: #ccc; box-shadow: 0 4px 0 #999; cursor: not-allowed; top: 0; transform: none; }
+
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-green); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <header><h3 style="margin:0;">🕌 Prayer Assistant</h3></header>
+        <div id="chatbox"></div>
+        <div class="controls">
+            <input type="text" id="userInput" placeholder="Ask about namaz times..." onkeypress="handleKeyPress(event)">
+            <button id="sendBtn" onclick="sendMessage()">Send</button>
+            <div id="spinner" class="loader"></div>
+        </div>
+    </div>
+
+    <script>
+        const input = document.getElementById('userInput');
+        const chatbox = document.getElementById('chatbox');
+        const btn = document.getElementById('sendBtn');
+        const spinner = document.getElementById('spinner');
+
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
+
+        async function sendMessage() {
+            const message = input.value.trim();
+            if (!message) return;
+
+            chatbox.innerHTML += `<div class="msg user"><b>You:</b> ${message}</div>`;
+            input.value = '';
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            chatbox.scrollTop = chatbox.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: message })
+                });
+                const data = await response.json();
+                chatbox.innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.response}</div>`;
+            } catch (err) {
+                chatbox.innerHTML += `<div class="msg bot" style="color:red;">Error connecting to server.</div>`;
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                chatbox.scrollTop = chatbox.scrollHeight;
+            }
+        }
+    </script>
+</body>
+</html>

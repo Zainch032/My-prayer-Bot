@@ -1,0 +1,7 @@
+flask
+langchain-groq
+langchain-community
+langchain-core
+python-dotenv
+requests
+langchain
