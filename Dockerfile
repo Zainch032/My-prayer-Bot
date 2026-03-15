@@ -15,10 +15,10 @@ RUN pip install --upgrade pip && \
 
 COPY . /app
 
-EXPOSE 5000
+EXPOSE 7860
 
 ENV FLASK_APP=app.py \
     FLASK_RUN_HOST=0.0.0.0 \
-    FLASK_RUN_PORT=5000
+    FLASK_RUN_PORT=7860
 
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:7860", "app:app"]
