@@ -36,6 +36,12 @@ General AI models (like ChatGPT) suffer from "knowledge cutoff" and often fail t
 
 ![alt text](image-1.png)
 
+## 🌐 Live Demo
+
+You can try the live version of this app here: [My Prayer Bot on Hugging Face Spaces](https://huggingface.co/spaces/Zainch032/My-prayer-Bot)
+
+---
+
 ## 💻 Installation & Setup
 
 ### 1. Clone the Repository
