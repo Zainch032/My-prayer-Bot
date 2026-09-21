@@ -36,8 +36,11 @@ def get_daily_prayer_times(city: str = "lahore"):
     except Exception:
         return "Service temporarily unavailable. Please try again later."
 
-# Initialize Model
-model = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)
+# Groq retired llama-3.3-70b-versatile (Aug 2026). Override with GROQ_MODEL if needed.
+model = ChatGroq(
+    model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"),
+    temperature=0,
+)
 tool_model = model.bind_tools([get_daily_prayer_times])
 
 @app.route('/')
@@ -46,9 +49,11 @@ def home():
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_input = request.json.get("message", "").lower().strip()
-    
-    # Start the message history with a System Message for better results
+    payload = request.get_json(silent=True) or {}
+    user_input = str(payload.get("message", "")).strip()
+    if not user_input:
+        return jsonify({"response": "Please ask a question about prayer times."}), 400
+
     messages = [
         SystemMessage(content=(
             "You are a helpful Pakistani prayer time assistant. "
@@ -57,31 +62,33 @@ def chat():
             "extract ONLY that timing from the tool's result and answer concisely. "
             "3. If no city is mentioned, use Lahore as the default. "
             "4. Always be polite and respectful."
-
         )),
         HumanMessage(content=user_input)
     ]
-    
-    
-    # Step 1: First model call to see if it wants to use a tool
-    ai_msg = tool_model.invoke(messages)
-    messages.append(ai_msg)
 
-    # Step 2: If the model generated tool_calls, execute them
-    if ai_msg.tool_calls:
-        for tool_call in ai_msg.tool_calls:
-            # Execute the actual tool function
-            result = get_daily_prayer_times.invoke(tool_call)
-            # IMPORTANT: Wrap result in a ToolMessage so the LLM knows it's the answer
-            messages.append(ToolMessage(content=str(result), tool_call_id=tool_call["id"]))
-        
-        # Step 3: THE FIX - Call the model AGAIN with the tool result in history
-        # This generates the final human answer like "The Maghrib time in Lahore is 6:00 PM."
-        final_response = tool_model.invoke(messages)
-        return jsonify({"response": final_response.content})
-    
-    # If no tool was needed, just return the direct content
-    return jsonify({"response": ai_msg.content})
+    try:
+        ai_msg = tool_model.invoke(messages)
+        messages.append(ai_msg)
+
+        if ai_msg.tool_calls:
+            for tool_call in ai_msg.tool_calls:
+                result = get_daily_prayer_times.invoke(tool_call)
+                messages.append(ToolMessage(content=str(result), tool_call_id=tool_call["id"]))
+
+            final_response = tool_model.invoke(messages)
+            answer = final_response.content
+        else:
+            answer = ai_msg.content
+
+        if isinstance(answer, list):
+            answer = "".join(
+                part.get("text", "") if isinstance(part, dict) else str(part)
+                for part in answer
+            )
+        answer = (answer or "").strip() or "I could not generate a reply. Please try again."
+        return jsonify({"response": answer})
+    except Exception as exc:
+        return jsonify({"response": f"Sorry, I could not fetch prayer times right now. ({exc})"}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)

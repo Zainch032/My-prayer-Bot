@@ -59,6 +59,8 @@
 
         .user { align-self: flex-end; background: var(--user-bubble); color: #1a237e; border-bottom-right-radius: 4px; }
         .bot { align-self: flex-start; background: var(--bot-bubble); color: #1b5e20; border-bottom-left-radius: 4px; }
+        .msg strong { font-weight: 700; }
+        .msg em { font-style: italic; }
 
         /* Controls Section */
         .controls { 
@@ -111,15 +113,40 @@
 
         function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
 
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function formatMessage(text) {
+            let html = escapeHtml(text);
+            html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/(^|[^*])\*(?!\s)(.+?)\*(?!\*)/g, '$1<em>$2</em>');
+            html = html.replace(/\n/g, '<br>');
+            return html;
+        }
+
+        function addMessage(role, text, isError) {
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            if (isError) div.style.color = 'red';
+            const label = role === 'user' ? 'You' : 'Bot';
+            div.innerHTML = `<b>${label}:</b> ${formatMessage(text)}`;
+            chatbox.appendChild(div);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
         async function sendMessage() {
             const message = input.value.trim();
             if (!message) return;
 
-            chatbox.innerHTML += `<div class="msg user"><b>You:</b> ${message}</div>`;
+            addMessage('user', message);
             input.value = '';
             btn.disabled = true;
             spinner.style.display = 'block';
-            chatbox.scrollTop = chatbox.scrollHeight;
 
             try {
                 const response = await fetch('/chat', {
@@ -128,9 +155,10 @@
                     body: JSON.stringify({ message: message })
                 });
                 const data = await response.json();
-                chatbox.innerHTML += `<div class="msg bot"><b>Bot:</b> ${data.response}</div>`;
+                const text = data.response || 'Unexpected server response.';
+                addMessage('bot', text, !response.ok);
             } catch (err) {
-                chatbox.innerHTML += `<div class="msg bot" style="color:red;">Error connecting to server.</div>`;
+                addMessage('bot', 'Error connecting to server.', true);
             } finally {
                 btn.disabled = false;
                 spinner.style.display = 'none';

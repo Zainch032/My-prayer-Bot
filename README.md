@@ -63,7 +63,7 @@ In Pakistan, millions of people need accurate prayer times daily. But:
 
 ## Tech Stack
 
-- **LangChain + Groq** (llama-3.3-70b) — AI reasoning and tool calling
+- **LangChain + Groq** (`openai/gpt-oss-20b`) — AI reasoning and tool calling
 - **Aladhan API** — real-time prayer times
 - **Flask** — backend
 - **Docker** — deployment
