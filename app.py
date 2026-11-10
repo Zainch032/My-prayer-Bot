@@ -46,7 +46,9 @@ tool_model = model.bind_tools([get_daily_prayer_times])
 @app.route('/')
 def home():
     return render_template('index.html')
-
+@app.get("/health")
+def health():
+    return {"status": "online", "model_loaded": model is not None}
 @app.route('/chat', methods=['POST'])
 def chat():
     payload = request.get_json(silent=True) or {}
