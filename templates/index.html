@@ -110,6 +110,7 @@
         const chatbox = document.getElementById('chatbox');
         const btn = document.getElementById('sendBtn');
         const spinner = document.getElementById('spinner');
+        let clientHistory = [];
 
         function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
 
@@ -152,11 +153,18 @@
                 const response = await fetch('/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ message: message, history: clientHistory })
                 });
                 const data = await response.json();
                 const text = data.response || 'Unexpected server response.';
                 addMessage('bot', text, !response.ok);
+                if (data.history && Array.isArray(data.history)) {
+                    clientHistory = data.history;
+                } else {
+                    clientHistory.push({ role: 'user', content: message });
+                    clientHistory.push({ role: 'assistant', content: text });
+                    if (clientHistory.length > 12) clientHistory = clientHistory.slice(-12);
+                }
             } catch (err) {
                 addMessage('bot', 'Error connecting to server.', true);
             } finally {
